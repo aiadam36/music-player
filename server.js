@@ -8,9 +8,9 @@ const PORT = process.env.PORT || 3000;
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// API: List all audio files from /public/audio
+// API: List all audio files from /public/data/audio
 app.get("/api/tracks", (req, res) => {
-  const audioDir = path.join(__dirname, "public", "audio");
+  const audioDir = path.join(__dirname, "public", "data", "audio");
 
   if (!fs.existsSync(audioDir)) {
     fs.mkdirSync(audioDir, { recursive: true });
@@ -32,7 +32,7 @@ app.get("/api/tracks", (req, res) => {
         title: formatTitle(name),
         artist: "Unknown Artist",
         album: "Unknown Album",
-        src: `/audio/${file}`,
+        src: `/data/audio/${file}`,
         duration: null, // Duration resolved client-side via Web Audio API
         size: stats.size,
       };
@@ -46,7 +46,7 @@ app.get("/api/tracks", (req, res) => {
 
 // API: Serve .lrc lyrics file matching the audio filename
 app.get("/api/lyrics/:filename", (req, res) => {
-  const lyricsDir = path.join(__dirname, "public", "lyrics");
+  const lyricsDir = path.join(__dirname, "public", "data", "lyrics");
   const base = path.basename(req.params.filename, path.extname(req.params.filename));
 
   // Guard against path traversal
@@ -78,5 +78,5 @@ function formatTitle(name) {
 
 app.listen(PORT, () => {
   console.log(`Music Player running at http://localhost:${PORT}`);
-  console.log(`   Drop .mp3 / .wav / .ogg files into public/audio/ to get started.`);
+  console.log(`   Drop .mp3 / .wav / .ogg files into public/data/audio/ to get started.`);
 });
