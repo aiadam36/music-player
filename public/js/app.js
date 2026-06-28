@@ -32,8 +32,8 @@ const lyricsEmpty = document.getElementById("lyricsEmpty");
 let tracks     = [];
 let currentIdx = 0;
 let isPlaying  = false;
-let isShuffle  = false;
-let isRepeat   = false;
+let isShuffle  = localStorage.getItem("isShuffle") === "true";
+let isRepeat   = localStorage.getItem("isRepeat")  === "true";
 let isDragging = false;
 
 /* Lyrics */
@@ -157,11 +157,13 @@ function randomIdx() {
 shuffleBtn.addEventListener("click", () => {
   isShuffle = !isShuffle;
   shuffleBtn.classList.toggle("active", isShuffle);
+  localStorage.setItem("isShuffle", isShuffle);
 });
 
 repeatBtn.addEventListener("click", () => {
   isRepeat = !isRepeat;
   repeatBtn.classList.toggle("active", isRepeat);
+  localStorage.setItem("isRepeat", isRepeat);
 });
 
 /* ══════════════════════════
@@ -491,5 +493,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* ── Init ── */
+shuffleBtn.classList.toggle("active", isShuffle);
+repeatBtn.classList.toggle("active", isRepeat);
 loadTracks();
 stopVisualizer(); // Draw idle state
