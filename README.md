@@ -32,9 +32,11 @@ public/
     cool-tune.ogg
 ```
 
-Supported formats: `.mp3` `.wav` `.ogg` `.flac` `.m4a`
+Supported formats: `.mp3` `.wav` `.ogg` `.flac` `.m4a` `.opus`
 
 Refresh the page — tracks appear automatically in the playlist.
+
+**Note: For Safari, `.opus` may or may not work depending on your iOS/macOS version.**
 
 ## Adding Lyrics
 

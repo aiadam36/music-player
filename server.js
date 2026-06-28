@@ -16,7 +16,7 @@ app.get("/api/tracks", (req, res) => {
     fs.mkdirSync(audioDir, { recursive: true });
   }
 
-  const supportedExtensions = [".mp3", ".wav", ".ogg", ".flac", ".m4a"];
+  const supportedExtensions = [".mp3", ".wav", ".ogg", ".flac", ".m4a", ".opus"];
 
   try {
     const files = fs.readdirSync(audioDir).filter((file) => {
