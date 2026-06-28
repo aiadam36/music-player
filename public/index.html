@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Music Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Background ambient -->
+      <div class="ambient" id="ambient"></div>
+
+      <!-- Player card -->
+      <main class="player-card">
+        <!-- Album art -->
+        <section class="art-section">
+          <div class="album-art" id="albumArt">
+            <div class="art-placeholder">
+              <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="40" r="30" stroke="#7B5CF0" stroke-width="1.5" opacity="0.4"/>
+                <circle cx="40" cy="40" r="18" stroke="#7B5CF0" stroke-width="1.5" opacity="0.6"/>
+                <circle cx="40" cy="40" r="5" fill="#7B5CF0" opacity="0.8"/>
+              </svg>
+            </div>
+          </div>
+          <div class="vinyl-ring" id="vinylRing"></div>
+        </section>
+
+        <!-- Controls section -->
+        <section class="controls-section">
+          <!-- Track info -->
+          <div class="track-info">
+            <span class="track-label">NOW PLAYING</span>
+            <h1 class="track-title" id="trackTitle">No Track Selected</h1>
+            <p class="track-artist" id="trackArtist">Add audio files to get started</p>
+          </div>
+
+          <!-- Waveform visualizer (signature element) -->
+          <div class="visualizer-wrap">
+            <canvas class="visualizer" id="visualizer"></canvas>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-area">
+            <span class="time" id="currentTime">0:00</span>
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-thumb" id="progressThumb"></div>
+              </div>
+            </div>
+            <span class="time" id="duration">0:00</span>
+          </div>
+
+          <!-- Main controls -->
+          <div class="main-controls">
+            <button class="ctrl-btn shuffle" id="shuffleBtn" title="Shuffle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+              </svg>
+            </button>
+
+            <button class="ctrl-btn prev" id="prevBtn" title="Previous">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/>
+              </svg>
+            </button>
+
+            <button class="ctrl-btn play-pause" id="playPauseBtn" title="Play / Pause">
+              <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+            </button>
+
+            <button class="ctrl-btn next" id="nextBtn" title="Next">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 3.9V8.1L8.5 12zM16 6h2v12h-2z"/>
+              </svg>
+            </button>
+
+            <button class="ctrl-btn repeat" id="repeatBtn" title="Repeat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Volume -->
+          <div class="volume-area">
+            <button class="vol-icon" id="muteBtn" title="Mute">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+              </svg>
+            </button>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" />
+          </div>
+        </section>
+      </main>
+
+      <!-- Playlist drawer -->
+      <div class="playlist-wrap">
+        <button class="playlist-toggle" id="playlistToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+          <span>Playlist</span>
+          <span class="track-count" id="trackCount">0 tracks</span>
+        </button>
+
+        <div class="playlist-drawer" id="playlistDrawer">
+          <div class="playlist-inner">
+            <div class="playlist-empty" id="playlistEmpty">
+              <p>Drop <code>.mp3</code>, <code>.wav</code>, or <code>.ogg</code> files into</p>
+              <p><code>public/audio/</code> and refresh.</p>
+            </div>
+            <ul class="playlist-items" id="playlistItems"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <audio id="audioEl" preload="metadata"></audio>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
