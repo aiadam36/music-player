@@ -143,5 +143,4 @@ vite.config.ts.timestamp-*
 .vite/
 
 # User data
-public/audio/
-public/lyrics/
+public/data/

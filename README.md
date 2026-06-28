@@ -22,14 +22,15 @@ Open `http://localhost:3000` in your browser.
 
 ## Adding Music
 
-Drop audio files into `public/audio/`:
+Drop audio files into `public/data/audio/`:
 
 ```
 public/
-  audio/
-    my-song.mp3
-    another-track.wav
-    cool-tune.ogg
+  data/
+    audio/
+      my-song.mp3
+      another-track.wav
+      cool-tune.ogg
 ```
 
 Supported formats: `.mp3` `.wav` `.ogg` `.flac` `.m4a` `.opus`
@@ -40,14 +41,15 @@ Refresh the page — tracks appear automatically in the playlist.
 
 ## Adding Lyrics
 
-Drop lyrics files into `public/lyrics/`:
+Drop lyrics files into `public/data/lyrics/`:
 
 ```
 public/
-  lyrics/
-    my-song.lrc
-    another-track.lrc
-    cool-tune.lrc
+  data/
+    lyrics/
+      my-song.lrc
+      another-track.lrc
+      cool-tune.lrc
 ```
 
 Supported formats: `.lrc`
@@ -58,10 +60,11 @@ Supported formats: `.lrc`
 
 ```
 public/
-  audio/
-    Glory_Song.mp3
-  lyrics/
-    Glory_Song.lrc   ← same basename, different folder
+  data/
+    audio/
+      Glory_Song.mp3
+    lyrics/
+      Glory_Song.lrc   ← same basename, different folder
 ```
 
 ---
