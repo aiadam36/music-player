@@ -44,6 +44,25 @@ app.get("/api/tracks", (req, res) => {
   }
 });
 
+// API: Serve .lrc lyrics file matching the audio filename
+app.get("/api/lyrics/:filename", (req, res) => {
+  const lyricsDir = path.join(__dirname, "public", "lyrics");
+  const base = path.basename(req.params.filename, path.extname(req.params.filename));
+
+  // Guard against path traversal
+  if (base.includes("..") || base.includes("/")) {
+    return res.status(400).json({ error: "Invalid filename" });
+  }
+
+  const lrcPath = path.join(lyricsDir, `${base}.lrc`);
+
+  if (!fs.existsSync(lrcPath)) {
+    return res.status(404).json({ error: "No lyrics found" });
+  }
+
+  res.type("text/plain").send(fs.readFileSync(lrcPath, "utf8"));
+});
+
 // Serve the main app
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));

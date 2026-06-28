@@ -24,6 +24,10 @@ const ambient     = document.getElementById("ambient");
 const iconPlay    = playPauseBtn.querySelector(".icon-play");
 const iconPause   = playPauseBtn.querySelector(".icon-pause");
 
+const lyricsPanel = document.getElementById("lyricsPanel");
+const lyricsInner = document.getElementById("lyricsInner");
+const lyricsEmpty = document.getElementById("lyricsEmpty");
+
 /* ── State ── */
 let tracks     = [];
 let currentIdx = 0;
@@ -31,6 +35,11 @@ let isPlaying  = false;
 let isShuffle  = false;
 let isRepeat   = false;
 let isDragging = false;
+
+/* Lyrics */
+let lyrics      = [];   // [{time: seconds|null, text: string}]
+let isTimed     = false;
+let lastLyricIdx = -1;
 
 /* Web Audio */
 let audioCtx, analyser, source, dataArray, rafId;
@@ -69,6 +78,8 @@ function loadTrack(idx, autoplay = true) {
   trackArtist.textContent = track.artist;
 
   highlightPlaylistItem(currentIdx);
+
+  loadLyrics(track.src);   // ← lyrics
 
   if (autoplay) {
     play();
@@ -161,6 +172,7 @@ audio.addEventListener("timeupdate", () => {
   const pct = (audio.currentTime / audio.duration) * 100;
   setProgress(pct);
   currentTimeEl.textContent = formatTime(audio.currentTime);
+  if (isTimed && lyrics.length) updateLyricHighlight(audio.currentTime);
 });
 
 audio.addEventListener("loadedmetadata", () => {
@@ -351,6 +363,104 @@ function stopVisualizer() {
     ctx.beginPath();
     ctx.roundRect(x, y, bw, bh, 2);
     ctx.fill();
+  }
+}
+
+/* ══════════════════════════
+   10. Lyrics
+══════════════════════════ */
+
+async function loadLyrics(src) {
+  lyrics       = [];
+  isTimed      = false;
+  lastLyricIdx = -1;
+  lyricsInner.innerHTML = "";
+  lyricsInner.appendChild(lyricsEmpty);
+  lyricsEmpty.style.display = "block";
+
+  const filename = src.split("/").pop();
+
+  try {
+    const res = await fetch(`/api/lyrics/${encodeURIComponent(filename)}`);
+    if (!res.ok) return;
+    const raw = await res.text();
+    parseLrc(raw);
+    renderLyrics();
+  } catch (e) { /* silent */ }
+}
+
+function parseLrc(raw) {
+  const lines      = raw.split(/\r?\n/);
+  const timedLines = [];
+  const untimedLines = [];
+  const timeRe     = /^\[(\d{1,2}):(\d{2})(?:[.:]\d+)?\](.*)/;
+
+  for (const line of lines) {
+    const m = line.match(timeRe);
+    if (m) {
+      const t    = parseInt(m[1], 10) * 60 + parseFloat(m[2]);
+      const text = m[3].trim();
+      if (text) timedLines.push({ time: t, text });
+    } else {
+      const isMeta = /^\[[a-z]{1,4}:/i.test(line);
+      if (!isMeta) {
+        const text = line.trim();
+        if (text) untimedLines.push({ time: null, text });
+      }
+    }
+  }
+
+  if (timedLines.length > 0) {
+    timedLines.sort((a, b) => a.time - b.time);
+    lyrics  = timedLines;
+    isTimed = true;
+  } else {
+    lyrics  = untimedLines;
+    isTimed = false;
+  }
+}
+
+function renderLyrics() {
+  lyricsInner.innerHTML = "";
+
+  if (!lyrics.length) {
+    lyricsInner.appendChild(lyricsEmpty);
+    lyricsEmpty.style.display = "block";
+    return;
+  }
+
+  lyrics.forEach((line, i) => {
+    const el = document.createElement("p");
+    el.className   = "lyric-line";
+    el.textContent = line.text;
+    el.dataset.idx = i;
+    lyricsInner.appendChild(el);
+  });
+
+  lyricsInner.scrollTop = 0;
+}
+
+function updateLyricHighlight(currentTime) {
+  let active = -1;
+  for (let i = 0; i < lyrics.length; i++) {
+    if (lyrics[i].time <= currentTime) active = i;
+    else break;
+  }
+
+  if (active === lastLyricIdx) return;
+  lastLyricIdx = active;
+
+  const lines = lyricsInner.querySelectorAll(".lyric-line");
+  lines.forEach((el, i) => {
+    el.classList.remove("active", "near");
+    if (i === active)                           el.classList.add("active");
+    else if (i === active - 1 || i === active + 1) el.classList.add("near");
+  });
+
+  if (active >= 0 && lines[active]) {
+    const lineEl  = lines[active];
+    const panelH  = lyricsInner.clientHeight;
+    lyricsInner.scrollTop = lineEl.offsetTop - panelH / 2 + lineEl.offsetHeight / 2;
   }
 }
 
